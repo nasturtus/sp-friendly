@@ -1,7 +1,7 @@
 const express = require("express");
-const manageFriendsRouter = express.Router();
 const mongoose = require("mongoose");
 
+const manageFriendsRouter = express.Router();
 const Friend = require("../model/friend");
 
 const addUser = async user => {
