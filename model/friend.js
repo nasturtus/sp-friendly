@@ -3,10 +3,10 @@ const mongoose = require("mongoose");
 // mongoose schema
 const friendSchema = mongoose.Schema({
   user: String,
-  friends: [String],
-  blocked: [String],
-  subcribedTo: [String]
+  friends: { type: [String], default: [] },
+  blocked: { type: [String], default: [] },
+  subcribedTo: { type: [String], default: [] }
 });
 
 // schema to model and export model
-module.exports = mongoose.model(Friend, friendSchema);
+module.exports = mongoose.model("Friend", friendSchema);
