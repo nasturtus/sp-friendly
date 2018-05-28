@@ -4,10 +4,19 @@ const mongoose = require("mongoose");
 const Friend = require("../model/friend");
 
 showAllRouter.get("/", async (req, res) => {
-  const result = await Friend.find();
+  const results = await Friend.find();
+  console.log(results);
   res.status(200).json({
-    count: result.length,
-    result
+    count: results.length,
+    results: results.map(result => {
+      return {
+        _id: result._id,
+        user: result.user,
+        friends: result.friends,
+        subscribedTo: result.subscribedTo,
+        blocked: result.blocked
+      };
+    })
   });
 });
 
