@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const Friend = require("../model/friend");
 
 const addUser = async user => {
+  console.log();
   const result = await Friend.findOne({ user: user });
   console.log(result);
   if (!result) {
@@ -20,22 +21,35 @@ const addUser = async user => {
   }
 };
 
-const addFriends = async (user1, user2) => {
-  const result = await Friend.findOne({ user: user1 });
-  console.log(result);
-  if (!result.friends.includes(user2)) {
-    result.friends.push(user2);
-    console.log(result.friends);
-  }
-  const updatedResult = await Friend.findByIdAndUpdate(result._id, {
-    friends: result.friends
-  });
-  console.log("Updated result:");
-
+const updateFriendsList = async mainUser => {
+  const updatedResult = await Friend.findByIdAndUpdate(
+    mainUser._id,
+    {
+      friends: mainUser.friends
+    },
+    { new: true }
+  );
+  console.log(
+    `Updated result after adding friend to ${mainUser.user}'s friends list:`
+  );
   console.log(updatedResult);
 };
 
-manageFriendsRouter.post("/", async (req, res) => {
+const addFriends = async (user1, user2) => {
+  console.log();
+  const user1Result = await Friend.findOne({ user: user1 });
+  console.log(user1Result);
+  if (!user1Result.friends.includes(user2)) {
+    user1Result.friends.push(user2);
+    updateFriendsList(user1Result);
+
+    const user2Result = await Friend.findOne({ user: user2 });
+    user2Result.friends.push(user1);
+    updateFriendsList(user2Result);
+  }
+};
+
+manageFriendsRouter.post("/addfriends", async (req, res) => {
   try {
     const user1 = req.body.friends[0];
     const user2 = req.body.friends[1];
