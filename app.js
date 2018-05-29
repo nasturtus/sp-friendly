@@ -22,6 +22,9 @@ app.use("/showall", showAllRouter);
 const clearAllRouter = require("./route/clearAll");
 app.use("/clearall", clearAllRouter);
 
+const addUserRouter = require("./route/addUser");
+app.use("/adduser", addUserRouter);
+
 const manageFriendsRouter = require("./route/manageFriends");
 app.use("/managefriends", manageFriendsRouter);
 
