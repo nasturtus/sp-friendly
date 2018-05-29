@@ -23,7 +23,7 @@ addUserRouter.post("/", async (req, res) => {
     });
   } else {
     console.log("user already exists");
-    res.status(200).json({
+    res.status(501).json({
       message: "user already exists"
     });
   }
