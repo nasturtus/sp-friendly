@@ -68,4 +68,24 @@ manageFriendsRouter.post("/addfriends", async (req, res) => {
   }
 });
 
+manageFriendsRouter.get("/getfriends", async (req, res) => {
+  try {
+    const result = await Friend.findOne({ user: req.body.email });
+    if (result) {
+      res.status(200).json({
+        success: "true",
+        friends: result.friends,
+        count: result.friends.length
+      });
+    } else {
+      throw new Error("No such user");
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(404).json({
+      error: error.message
+    });
+  }
+});
+
 module.exports = manageFriendsRouter;
