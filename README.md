@@ -19,6 +19,12 @@ The following endpoints have been covered:
 * /managefriends/block: "PUT method: block updates from another user",
 * /managefriends/getrecipients: "GET method: get users who'll receive updates from sender"
 
+Note: to add user use the following JSON body:
+![](public/Assets/adduser-post-method.png)
+
+_showall_ and _clearall_ require no JSON body.
+All other endpoints require JSON body as specified in the requirements.
+
 ## Dependencies
 
 * Express
