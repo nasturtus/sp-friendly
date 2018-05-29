@@ -4,9 +4,13 @@ const mongoose = require("mongoose");
 const manageFriendsRouter = express.Router();
 const Friend = require("../model/friend");
 
+const checkUserExists = async user => {
+  return await Friend.findOne({ user: user });
+};
+
 const addUser = async user => {
   console.log();
-  const result = await Friend.findOne({ user: user });
+  const result = await checkUserExists(user);
   console.log(result);
   if (!result) {
     // create new user and save to database; else do nothing
@@ -78,14 +82,43 @@ manageFriendsRouter.get("/getfriends", async (req, res) => {
         count: result.friends.length
       });
     } else {
-      throw new Error("No such user");
+      throw new Error("No such user.");
     }
   } catch (error) {
-    res.status(404).json({
-      success: "false",
-      message: error.message
-    });
+    handleError(res, error);
   }
 });
+
+manageFriendsRouter.get("/getcommonfriends", async (req, res) => {
+  try {
+    const result1 = await checkUserExists(req.body.friends[0]);
+    console.log(result1);
+    const result2 = await checkUserExists(req.body.friends[1]);
+    console.log(result2);
+
+    // if either of the users doesn't exist, throw error
+
+    if (!result1 || !result2) {
+      throw new Error("No such user.");
+    }
+    const commonFriends = result1.friends.filter(friend => {
+      return result2.friends.includes(friend);
+    });
+    res.status(200).json({
+      success: true,
+      friends: commonFriends,
+      count: commonFriends.length
+    });
+  } catch (error) {
+    handleError(res, error);
+  }
+});
+
+const handleError = (res, error) => {
+  res.status(404).json({
+    success: "false",
+    message: error.message
+  });
+};
 
 module.exports = manageFriendsRouter;
