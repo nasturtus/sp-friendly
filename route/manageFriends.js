@@ -81,9 +81,9 @@ manageFriendsRouter.get("/getfriends", async (req, res) => {
       throw new Error("No such user");
     }
   } catch (error) {
-    console.log(error);
     res.status(404).json({
-      error: error.message
+      success: "false",
+      message: error.message
     });
   }
 });
