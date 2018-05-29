@@ -48,7 +48,7 @@ const addFriends = async (user1, user2) => {
   ) {
     return "Cannot add as friends: blocked.";
   } else if (result1.friends.includes(user2)) {
-    return "Redundant: they are friends already.";
+    return "Redundant: they are already friends.";
   }
 
   // if not friends then go ahead with adding
@@ -71,7 +71,7 @@ manageFriendsRouter.post("/addfriends", async (req, res) => {
   if (
     status === "No such user." ||
     status === "Cannot add as friends: blocked." ||
-    status === "Redundant: they are friends already."
+    status === "Redundant: they are already friends."
   ) {
     handleError(res, new Error(status));
   } else {
@@ -130,16 +130,19 @@ manageFriendsRouter.post("/subscribe", async (req, res) => {
     const target = await checkUserExists(req.body.target);
     console.log(target);
 
-    // if either of the users doesn't exist, or if target has blocked requestor,
+    // if either of the users doesn't exist, or if either has blocked the other,
     // or if requestor has already subscribed to target
     // then throw error
     // else go ahead with adding target to requestor's subscribedTo list
 
     if (!requestor || !target) {
       throw new Error("No such user.");
-    } else if (target.blocked.includes(requestor.user)) {
+    } else if (
+      target.blocked.includes(requestor.user) ||
+      requestor.blocked.includes(target.user)
+    ) {
       throw new Error(
-        `Cannot subscribe to update: ${requestor.user} is blocked.`
+        `Cannot subscribe to update: either requestor or target is blocked.`
       );
     } else if (requestor.subscribedTo.includes(target.user)) {
       throw new Error(
@@ -209,8 +212,10 @@ manageFriendsRouter.get("/getrecipients", async (req, res) => {
       throw new Error("No such user.");
     }
 
-    // 1: extract all email mentions from text
-    const emailMentions = req.body.text.match(/[a-z]+@[a-z]+.com/gi);
+    // 1: extract all email mentions from text. result might be null if no match.
+    // if null, assign [] to make it iterable.
+    let emailMentions = req.body.text.match(/[a-z]+@[a-z]+.com/gi);
+    if (!emailMentions) emailMentions = [];
 
     // 2: retrieve list of friends
     const sendersFriendsObj = await Friend.find(
@@ -228,7 +233,7 @@ manageFriendsRouter.get("/getrecipients", async (req, res) => {
       return item.user;
     });
 
-    // combine lists 1, 2, 3. might contain duplicates.
+    // combine lists 1, 2, 3. result might contain duplicates.
     const aggregatedList = [
       ...emailMentions,
       ...sendersFriends,
