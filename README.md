@@ -5,7 +5,9 @@
 ## Getting Started
 
 Deployed on Heroku at: https://sp-friendly.herokuapp.com/
-To view the app, head over to the above-mentioned URL via Insomnia or Postman. You will see a welcome JSON with available endpoint options.
+To view the app, please head over to the above-mentioned URL via Insomnia or Postman. You will see a welcome JSON with available endpoint options.
+
+_NOTE: Heroku can be a bit slow. Please wait around 5 seconds for some responses._
 
 The following endpoints have been covered:
 
@@ -19,11 +21,15 @@ The following endpoints have been covered:
 * /managefriends/block: "PUT method: block updates from another user",
 * /managefriends/getrecipients: "GET method: get users who'll receive updates from sender"
 
-Note: to add user use the following JSON body:
-![](public/Assets/adduser-post-method.png)
+Note:
 
-_showall_ and _clearall_ require no JSON body.
-All other endpoints require JSON body as specified in the requirements.
+* The backend comes populated with all the scenarios covered in the requirements.
+* To add further users, please add the following JSON body as shown:
+  ![](public/Assets/adduser-post-method.png)
+
+_showall_ and _clearall_ require no JSON body. All other endpoints require JSON body as specified in the requirements.
+Here is a screenshot of _showall_ with current users in the collection.
+![](public/Assets/showall-get-method.png)
 
 ## Dependencies
 
