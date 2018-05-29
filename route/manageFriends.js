@@ -38,7 +38,7 @@ const addFriends = async (user1, user2) => {
   console.log(result2);
 
   // if either of the users doesn't exist or if one has blocked the other, then throw error
-  // if they are already friends then appropriate message
+  // if they are already friends then return appropriate message
 
   if (!result1 || !result2) {
     return "No such user.";
@@ -57,7 +57,6 @@ const addFriends = async (user1, user2) => {
     result1.friends.push(user2);
     updateFriendsList(result1);
 
-    // const user2Result = await Friend.findOne({ user: user2 });
     result2.friends.push(user1);
     updateFriendsList(result2);
     return "Success";
@@ -197,6 +196,49 @@ manageFriendsRouter.post("/block", async (req, res) => {
         success: "true"
       });
     }
+  } catch (error) {
+    handleError(res, error);
+  }
+});
+
+manageFriendsRouter.get("/getrecipients", async (req, res) => {
+  try {
+    const sender = req.body.sender;
+    const result = await checkUserExists(sender);
+    if (!result) {
+      throw new Error("No such user.");
+    }
+
+    // 1: extract all email mentions from text
+    const emailMentions = req.body.text.match(/[a-z]+@[a-z]+.com/gi);
+
+    // 2: retrieve list of friends
+    const sendersFriendsObj = await Friend.find(
+      { user: sender },
+      { _id: 0, friends: 1 }
+    );
+    sendersFriends = sendersFriendsObj[0].friends;
+
+    // 3: retrieve all users where sender is listed in their subscribedTo
+    const subscribersObj = await Friend.find(
+      { subscribedTo: sender },
+      { user: 1, _id: 0 }
+    );
+    const subscribers = subscribersObj.map(item => {
+      return item.user;
+    });
+
+    // combine lists 1, 2, 3. might contain duplicates.
+    const aggregatedList = [
+      ...emailMentions,
+      ...sendersFriends,
+      ...subscribers
+    ];
+
+    //  to remove duplicates
+    const finalList = new Set(aggregatedList);
+
+    res.json({ success: "true", recipients: Array.from(finalList) });
   } catch (error) {
     handleError(res, error);
   }
